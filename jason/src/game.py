@@ -19,9 +19,7 @@ class Game:
     def __init__(self):
         tank_id_message: dict = comms.read_message()
         self.tank_id = tank_id_message["message"]["your-tank-id"]
-        self.opponent_id = tank_id_message["message"]["enemy-tank-id"]
-        self.opponent_last_position = None
-        self.opponent_current_position = None
+        self.enemy_id = tank_id_message["message"]["enemy-tank-id"]
 
         self.current_turn_message = None
 
@@ -97,8 +95,17 @@ class Game:
         self.shoot_at_enemy()
 
     def shoot_at_enemy(self):
+        target_angle = 0
+        self_x, self_y = self.objects[self.tank_id]["position"]
+        enemy_x, enemy_y = self.objects[self.enemy_id]["position"]
         
+        # Calculate distance to enemy tank to get angle 
+        x_dist, y_dist = enemy_x - self_x, enemy_y - self_y
+        angle = math.degrees(math.atan(enemy_y / enemy_x))
+        # Flip angle if x_dist is negative
+        angle = 180 - angle if x_dist < 0 else angle
+
         comms.post_message({
-            "shoot": 0
+            "shoot": target_angle
             })
         
