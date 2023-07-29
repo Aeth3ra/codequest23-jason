@@ -18,6 +18,7 @@ class Game:
     def __init__(self):
         tank_id_message: dict = comms.read_message()
         self.tank_id = tank_id_message["message"]["your-tank-id"]
+        self.opponent_id = tank_id_message["message"]["enemy-tank-id"]
 
         self.current_turn_message = None
 
