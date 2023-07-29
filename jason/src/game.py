@@ -97,10 +97,6 @@ class Game:
         self.target_enemy()
 
     def shoot_at_enemy(self):
-        """
-            Tries to find enemy position by checking if the location changed
-            If not, will throw keyerror which defaults behaviour to using previously stored enemy location
-        """
         
         target_angle = self.target_enemy()
         
@@ -110,6 +106,12 @@ class Game:
             })
         
     def target_enemy(self, enemy_position_array) -> int:
+        """
+            Returns a target int angle based on the position of opponent
+
+            If opponent position changed, will try to get value
+            Else will throw keyerror and default to using opponent last location
+        """
         target = 0
 
         try:
