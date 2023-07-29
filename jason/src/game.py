@@ -94,31 +94,11 @@ class Game:
 
         # Write your code here... For demonstration, this bot just shoots randomly every turn.
 
-        self.target_enemy()
+        self.shoot_at_enemy()
 
     def shoot_at_enemy(self):
         
-        target_angle = self.target_enemy()
-        
-
         comms.post_message({
-            "shoot": target_angle
+            "shoot": 0
             })
         
-    def target_enemy(self, enemy_position_array) -> int:
-        """
-            Returns a target int angle based on the position of opponent
-
-            If opponent position changed, will try to get value
-            Else will throw keyerror and default to using opponent last location
-        """
-        target = 0
-
-        try:
-            self.opponent_current_position = self.current_turn_message["updated_objects"][self.opponent_id]["position"] # As [356.12, 534.39]
-            # target = Angle calculations to find enemy using self.opponent_current_position
-            self.opponent_last_position = self.opponent_current_position
-        except KeyError: # If enemy hasn't moved
-            pass # target = Angle calculations to find enemy using self.opponent_last_position
-        
-        return target
