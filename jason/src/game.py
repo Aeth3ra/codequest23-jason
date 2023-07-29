@@ -93,12 +93,13 @@ class Game:
 
         # Write your code here... For demonstration, this bot just shoots randomly every turn.
         turn = {}
-        turn["shoot"] = self.shoot_at_enemy(turn)
-        turn["path"] = self.shoot_at_enemy(turn)
-
+        #turn["shoot"] = self.shoot_at_enemy()
+        #print(self.objects, file=sys.stderr)
+        turn["path"] = self.path_find()
+        
         comms.post_message(turn)
 
-    def shoot_at_enemy(self, given_dict):
+    def shoot_at_enemy(self):
         target_angle = 0
         self_x, self_y = self.objects[self.tank_id]["position"]
         enemy_x, enemy_y = self.objects[self.enemy_id]["position"]
@@ -115,7 +116,7 @@ class Game:
         # calculate distance
         dist = math.sqrt(x_dist**2 + y_dist**2)
 
-        inaccuracy_lim = (45*dist)/(dist+100)
+        inaccuracy_lim = int((45*dist)/(dist+100))
         angle += random.randint(-inaccuracy_lim,inaccuracy_lim)
 
         target_angle = angle % 360
@@ -123,18 +124,21 @@ class Game:
         return target_angle
 
 
-    def path_find(self, given_dict):
+    def path_find(self):
         play_area = self.border_restriction()
-        random_move_x = random.randrange(play_area[0][0], play_area[2][0])
-        random_move_y = random.randrange(play_area[0][1], play_area[2][1])
+        print(play_area, file=sys.stderr)
+        random_move_x = random.randrange(int(play_area[0][0]), int(play_area[2][0]))
+        random_move_y = random.randrange(int(play_area[2][1]), int(play_area[0][1]))
         print(random_move_x, random_move_y, file=sys.stderr)
         return [random_move_x, random_move_y]
 
     def border_restriction(self) -> []:
-        boundary = self.objects["updated_objects"]["boundary-id"]["position"]
+        boundary = self.objects["closing_boundary-1"]["position"]
+        print("bound", boundary, file=sys.stderr)
+        hor_reduce = (boundary[3][0] - boundary[0][0]) * 0.1
+        ver_reduce = (boundary[0][1] - boundary[1][1]) * 0.1
 
-        hor_reduce = boundary[3][0] - boundary[0][0] * 0.1
-        ver_reduce = boundary[0][1] - boundary[1][1] * 0.1
+        print(hor_reduce, ver_reduce, file=sys.stderr)
 
         new_border = []
         new_border.append([boundary[0][0] + hor_reduce, boundary[0][1] - ver_reduce]) # top_left
