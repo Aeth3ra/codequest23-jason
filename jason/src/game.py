@@ -108,6 +108,10 @@ class Game:
             # Flip angle if x_dist is negative
             angle = 180 + angle if x_dist < 0 else angle
 
+        # calculate distance
+        dist = math.sqrt(x_dist**2 + y_dist**2)
+        
+
         target_angle = angle % 360
         comms.post_message({
             "shoot": target_angle
