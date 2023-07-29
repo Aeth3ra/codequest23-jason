@@ -92,10 +92,13 @@ class Game:
         """
 
         # Write your code here... For demonstration, this bot just shoots randomly every turn.
+        turn = {}
+        self.shoot_at_enemy(turn)
+        self.path_find(turn)
 
-        self.shoot_at_enemy()
+        comms.post_message(turn)
 
-    def shoot_at_enemy(self):
+    def shoot_at_enemy(self, given_dict):
         target_angle = 0
         self_x, self_y = self.objects[self.tank_id]["position"]
         enemy_x, enemy_y = self.objects[self.enemy_id]["position"]
