@@ -92,10 +92,13 @@ class Game:
         """
 
         # Write your code here... For demonstration, this bot just shoots randomly every turn.
+        turn = {}
+        self.shoot_at_enemy(turn)
+        self.path_find(turn)
 
-        self.shoot_at_enemy()
+        comms.post_message(turn)
 
-    def shoot_at_enemy(self):
+    def shoot_at_enemy(self, given_dict):
         target_angle = 0
         self_x, self_y = self.objects[self.tank_id]["position"]
         enemy_x, enemy_y = self.objects[self.enemy_id]["position"]
@@ -116,7 +119,29 @@ class Game:
         angle += random.randint(-inaccuracy_lim,inaccuracy_lim)
 
         target_angle = angle % 360
-        comms.post_message({
-            "shoot": target_angle
-            })
+
+        given_dict["shoot"] = target_angle
+
+
+    def path_find(self, given_dict):
+        play_area = self.border_restriction()
+        random_move_x = random.randrange(play_area[0][0], play_area[2][0])
+        random_move_y = random.randrange(play_area[0][1], play_area[2][1])
+        print(random_move_x, random_move_y, file=sys.stderr)
+        given_dict["path"] = [random_move_x, random_move_y]
+
+    def border_restriction(self) -> []:
+        boundary = self.objects["updated_objects"]["boundary-id"]["position"]
+
+        hor_reduce = boundary[3][0] - boundary[0][0] * 0.1
+        ver_reduce = boundary[0][1] - boundary[1][1] * 0.1
+
+        new_border = []
+        new_border.append([boundary[0][0] + hor_reduce, boundary[0][1] - ver_reduce]) # top_left
+        new_border.append([boundary[1][0] + hor_reduce, boundary[1][1] + ver_reduce]) # bot_left
+        new_border.append([boundary[2][0] - hor_reduce, boundary[2][1] + ver_reduce]) # bot_right
+        new_border.append([boundary[3][0] - hor_reduce, boundary[3][1] - ver_reduce]) # top_right
+
+        return new_border
+
         
