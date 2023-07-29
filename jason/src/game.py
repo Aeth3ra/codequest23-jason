@@ -116,7 +116,10 @@ class Game:
         angle += random.randint(-inaccuracy_lim,inaccuracy_lim)
 
         target_angle = angle % 360
+        
         comms.post_message({
             "shoot": target_angle
             })
+        
+        return target_angle
         
