@@ -1,5 +1,6 @@
 import random
 import math
+import sys
 
 import comms
 from object_types import ObjectTypes
@@ -106,7 +107,7 @@ class Game:
         else:
             angle = math.degrees(math.atan(y_dist / x_dist))
             # Flip angle if x_dist is negative
-            angle = 180 - angle if x_dist < 0 else angle
+            angle = 180 + angle if x_dist < 0 else angle
 
         target_angle = angle % 360
         comms.post_message({
