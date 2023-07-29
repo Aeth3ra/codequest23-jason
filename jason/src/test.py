@@ -1,7 +1,7 @@
 import math
 
-self_x, self_y = 0, 0
-enemy_x, enemy_y = 0, 1
+self_x, self_y = 0, 1
+enemy_x, enemy_y = 0, 0
 
 x_dist, y_dist = enemy_x - self_x, enemy_y - self_y
 if x_dist == 0:
