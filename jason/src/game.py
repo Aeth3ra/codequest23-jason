@@ -111,8 +111,9 @@ class Game:
 
         # calculate distance
         dist = math.sqrt(x_dist**2 + y_dist**2)
-        if dist > 40:
-            angle += random.randint(-15,15)
+
+        inaccuracy_lim = (45*dist)/(dist+100)
+        angle += random.randint(-inaccuracy_lim,inaccuracy_lim)
 
         target_angle = angle % 360
         comms.post_message({
