@@ -1,4 +1,5 @@
 import random
+import json
 
 import comms
 from object_types import ObjectTypes
@@ -19,6 +20,8 @@ class Game:
         tank_id_message: dict = comms.read_message()
         self.tank_id = tank_id_message["message"]["your-tank-id"]
         self.opponent_id = tank_id_message["message"]["enemy-tank-id"]
+        self.opponent_last_position = None
+        self.opponent_current_position = None
 
         self.current_turn_message = None
 
@@ -43,7 +46,7 @@ class Game:
         # Read all the objects and find the boundary objects
         boundaries = []
         for game_object in self.objects.values():
-            if game_object["type"] == ObjectTypes.BOUNDARY.value:
+            if game_object["type"] == ObjectTypes.BOUNDARY.value: 
                 boundaries.append(game_object)
 
         # The biggest X and the biggest Y among all Xs and Ys of boundaries must be the top right corner of the map.
@@ -91,8 +94,29 @@ class Game:
 
         # Write your code here... For demonstration, this bot just shoots randomly every turn.
 
+        self.target_enemy()
+
+    def shoot_at_enemy(self):
+        """
+            Tries to find enemy position by checking if the location changed
+            If not, will throw keyerror which defaults behaviour to using previously stored enemy location
+        """
+        
+        target_angle = self.target_enemy()
+        
+
         comms.post_message({
-            "shoot": random.uniform(0, random.randint(1, 360))
-        })
+            "shoot": target_angle
+            })
+        
+    def target_enemy(self, enemy_position_array) -> int:
+        target = 0
 
-
+        try:
+            self.opponent_current_position = self.current_turn_message["updated_objects"][self.opponent_id]["position"] # As [356.12, 534.39]
+            # target = Angle calculations to find enemy using self.opponent_current_position
+            self.opponent_last_position = self.opponent_current_position
+        except KeyError: # If enemy hasn't moved
+            pass # target = Angle calculations to find enemy using self.opponent_last_position
+        
+        return target
