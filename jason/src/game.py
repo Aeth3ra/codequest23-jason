@@ -186,3 +186,18 @@ class Game:
         width = boundary[3][0] - boundary[0][0]
         height = boundary[0][1] - boundary[1][1]
         return (width, height)
+    
+    def find_powerup(self):
+        self_x, self_y = self.objects[self.tank_id]["position"]
+
+        nearest_dist = float('inf')
+        nearest_power_x, nearest_power_y = float('inf'), float('inf')
+
+        for item in self.objects:
+            if item["type"] == ObjectTypes.POWERUP.value:
+                power_x, power_y = item["position"]
+                dist = math.sqrt((power_x - self_x)**2 + (power_y - self_y)**2)
+                if dist < nearest_dist:
+                    nearest_dist = dist
+                    nearest_power_x = power_x
+                    nearest_power_y = power_y
