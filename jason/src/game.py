@@ -21,6 +21,7 @@ class Game:
         self.tank_id = tank_id_message["message"]["your-tank-id"]
         self.enemy_id = tank_id_message["message"]["enemy-tank-id"]
 
+        self.previous_dest = None
         self.current_turn_message = None
 
         # We will store all game objects here
@@ -93,8 +94,12 @@ class Game:
         # Write your code here... For demonstration, this bot just shoots randomly every turn.
         turn = {}
         turn["shoot"] = self.shoot_at_enemy()
-        #print(self.objects, file=sys.stderr)
-        turn["path"] = self.path_find()
+        
+        # Make sure we don't path to the same place twice
+        if self.path_find() != self.previous_dest:
+            dest = self.path_find()
+            turn["path"] = dest
+            self.previous_dest = dest
         
         comms.post_message(turn)
 
@@ -127,16 +132,18 @@ class Game:
 
     def path_find(self):
         play_area = self.border_restriction()
-        danger_x = self.objects[self.tank_id]["position"][0] < play_area[0][0] or self.objects[self.tank_id]["position"][0] > play_area[2][0]
-        danger_y = self.objects[self.tank_id]["position"][0] < play_area[0][1] or self.objects[self.tank_id]["position"][0] > play_area[1][1]
-        if False:
+        x_min, x_max = int(play_area[0][0]), int(play_area[2][0])
+        y_min, y_max = int(play_area[2][1]), int(play_area[0][1])
+        self_x, self_y = self.objects[self.tank_id]["position"]
+
+        # If inside danger zone
+        if not (x_min < self_x < x_max) or not (y_min < self_y < y_max):
             middle_x = (int(play_area[0][0]) + int(play_area[2][0]))//2
             middle_y = (int(play_area[2][1]) + int(play_area[0][1]))//2
             return [middle_x, middle_y]
         else:
-            random_move_x = random.randrange(int(play_area[0][0]), int(play_area[2][0]))
-            random_move_y = random.randrange(int(play_area[2][1]), int(play_area[0][1]))
-        # print(random_move_x, random_move_y, file=sys.stderr)
+            random_move_x = random.randrange(x_min, x_max)
+            random_move_y = random.randrange(y_min, y_max)
             return [random_move_x, random_move_y]
 
     def border_restriction(self) -> []:
