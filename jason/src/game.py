@@ -5,7 +5,6 @@ import sys
 import comms
 from object_types import ObjectTypes
 
-
 class Game:
     """
     Stores all information about the game and manages the communication cycle.
@@ -93,7 +92,7 @@ class Game:
 
         # Write your code here... For demonstration, this bot just shoots randomly every turn.
         turn = {}
-        #turn["shoot"] = self.shoot_at_enemy()
+        turn["shoot"] = self.shoot_at_enemy()
         #print(self.objects, file=sys.stderr)
         turn["path"] = self.path_find()
         
@@ -115,30 +114,38 @@ class Game:
 
         # calculate distance
         dist = math.sqrt(x_dist**2 + y_dist**2)
+        enemy_velocity = self.objects[self.enemy_id]["velocity"]
 
-        inaccuracy_lim = int((45*dist)/(dist+100))
-        angle += random.randint(-inaccuracy_lim,inaccuracy_lim)
+        # only add inaccuaracy if enemy is moving
+        if enemy_velocity[0] != 0 and enemy_velocity[1] != 0:
+            inaccuracy_lim = int((45*dist)/(dist+100))
+            angle += random.randint(-inaccuracy_lim,inaccuracy_lim)
 
         target_angle = angle % 360
-
         return target_angle
 
 
     def path_find(self):
         play_area = self.border_restriction()
-        print(play_area, file=sys.stderr)
-        random_move_x = random.randrange(int(play_area[0][0]), int(play_area[2][0]))
-        random_move_y = random.randrange(int(play_area[2][1]), int(play_area[0][1]))
-        print(random_move_x, random_move_y, file=sys.stderr)
-        return [random_move_x, random_move_y]
+        danger_x = self.objects[self.tank_id]["position"][0] < play_area[0][0] or self.objects[self.tank_id]["position"][0] > play_area[2][0]
+        danger_y = self.objects[self.tank_id]["position"][0] < play_area[0][1] or self.objects[self.tank_id]["position"][0] > play_area[1][1]
+        if False:
+            middle_x = (int(play_area[0][0]) + int(play_area[2][0]))//2
+            middle_y = (int(play_area[2][1]) + int(play_area[0][1]))//2
+            return [middle_x, middle_y]
+        else:
+            random_move_x = random.randrange(int(play_area[0][0]), int(play_area[2][0]))
+            random_move_y = random.randrange(int(play_area[2][1]), int(play_area[0][1]))
+        # print(random_move_x, random_move_y, file=sys.stderr)
+            return [random_move_x, random_move_y]
 
     def border_restriction(self) -> []:
         boundary = self.objects["closing_boundary-1"]["position"]
-        print("bound", boundary, file=sys.stderr)
+        # print("bound", boundary, file=sys.stderr)
         hor_reduce = (boundary[3][0] - boundary[0][0]) * 0.1
         ver_reduce = (boundary[0][1] - boundary[1][1]) * 0.1
 
-        print(hor_reduce, ver_reduce, file=sys.stderr)
+        # print(hor_reduce, ver_reduce, file=sys.stderr)
 
         new_border = []
         new_border.append([boundary[0][0] + hor_reduce, boundary[0][1] - ver_reduce]) # top_left
