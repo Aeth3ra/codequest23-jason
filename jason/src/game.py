@@ -154,5 +154,4 @@ class Game:
         new_border.append([boundary[3][0] - hor_reduce, boundary[3][1] - ver_reduce]) # top_right
 
         return new_border
-
-        
+    
