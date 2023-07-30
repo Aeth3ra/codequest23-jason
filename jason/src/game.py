@@ -181,6 +181,8 @@ class Game:
                     boundary = item
                     break
 
+        boundary = boundary["position"]
+
         width = boundary[3][0] - boundary[0][0]
         height = boundary[0][1] - boundary[1][1]
         return (width, height)
