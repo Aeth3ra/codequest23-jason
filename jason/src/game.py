@@ -228,8 +228,8 @@ class Game:
         my_vert_axis = self.object[self.tank_id]["position"][1]
         my_hor_axis = self.object[self.tank_id]["position"][0]
 
-        hor_range = (my_hor_axis-25, my_hor_axis+25)
-        ver_range = (my_vert_axis-25, my_hor_axis+25)
+        hor_range = (my_hor_axis-50, my_hor_axis+50)
+        ver_range = (my_vert_axis-50, my_hor_axis+50)
 
         for possible_x in range(hor_range[0], hor_range[1]):
             if self.wall_map[possible_x][my_vert_axis] == 1:
