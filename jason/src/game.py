@@ -129,16 +129,12 @@ class Game:
         print(play_area, file=sys.stderr)
         random_move_x = random.randrange(int(play_area[0][0]), int(play_area[2][0]))
         random_move_y = random.randrange(int(play_area[2][1]), int(play_area[0][1]))
-        print(random_move_x, random_move_y, file=sys.stderr)
         return [random_move_x, random_move_y]
 
     def border_restriction(self) -> []:
         boundary = self.objects["closing_boundary-1"]["position"]
-        print("bound", boundary, file=sys.stderr)
         hor_reduce = (boundary[3][0] - boundary[0][0]) * 0.1
         ver_reduce = (boundary[0][1] - boundary[1][1]) * 0.1
-
-        print(hor_reduce, ver_reduce, file=sys.stderr)
 
         new_border = []
         new_border.append([boundary[0][0] + hor_reduce, boundary[0][1] - ver_reduce]) # top_left
@@ -147,5 +143,4 @@ class Game:
         new_border.append([boundary[3][0] - hor_reduce, boundary[3][1] - ver_reduce]) # top_right
 
         return new_border
-
-        
+    
