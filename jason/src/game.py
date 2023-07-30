@@ -117,7 +117,7 @@ class Game:
         dist = math.sqrt(x_dist**2 + y_dist**2)
 
         inaccuracy_lim = int((45*dist)/(dist+100))
-        angle += random.randint(-inaccuracy_lim,inaccuracy_lim)
+        angle += random.randint(-inaccuracy_lim, inaccuracy_lim)
 
         target_angle = angle % 360
 
@@ -126,7 +126,7 @@ class Game:
 
     def path_find(self):
         play_area = self.border_restriction()
-        print(play_area, file=sys.stderr)
+        
         random_move_x = random.randrange(int(play_area[0][0]), int(play_area[2][0]))
         random_move_y = random.randrange(int(play_area[2][1]), int(play_area[0][1]))
         return [random_move_x, random_move_y]
