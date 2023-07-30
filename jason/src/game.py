@@ -94,7 +94,7 @@ class Game:
         # Write your code here... For demonstration, this bot just shoots randomly every turn.
         turn = {}
         turn["shoot"] = self.shoot_at_enemy()
-        
+
         # Make sure we don't path to the same place twice
         if self.path_find() != self.previous_dest:
             dest = self.path_find()
@@ -136,10 +136,12 @@ class Game:
         y_min, y_max = int(play_area[2][1]), int(play_area[0][1])
         self_x, self_y = self.objects[self.tank_id]["position"]
 
+        map_width, map_height = self.get_map_size()
+
         # If inside danger zone
-        if not (x_min < self_x < x_max) or not (y_min < self_y < y_max):
-            middle_x = (int(play_area[0][0]) + int(play_area[2][0]))//2
-            middle_y = (int(play_area[2][1]) + int(play_area[0][1]))//2
+        if not (x_min < self_x < x_max) or not (y_min < self_y < y_max) or (y_max-y_min < 0.1*map_height):
+            middle_x = map_width // 2
+            middle_y = map_height // 2
             return [middle_x, middle_y]
         else:
             random_move_x = random.randrange(x_min, x_max)
@@ -147,12 +149,19 @@ class Game:
             return [random_move_x, random_move_y]
 
     def border_restriction(self) -> []:
-        boundary = self.objects["closing_boundary-1"]["position"]
-        # print("bound", boundary, file=sys.stderr)
+        boundary = self.objects.get("closing_boundary-1")
+
+        # If we couldn't find the boundary
+        if boundary is None:
+            for item in self.objects:
+                if item["type"] == ObjectTypes.CLOSING_BOUNDARY.value:
+                    boundary = item
+                    break
+        
+        boundary = boundary["position"]
+        
         hor_reduce = (boundary[3][0] - boundary[0][0]) * 0.1
         ver_reduce = (boundary[0][1] - boundary[1][1]) * 0.1
-
-        # print(hor_reduce, ver_reduce, file=sys.stderr)
 
         new_border = []
         new_border.append([boundary[0][0] + hor_reduce, boundary[0][1] - ver_reduce]) # top_left
@@ -162,3 +171,16 @@ class Game:
 
         return new_border
     
+    def get_map_size(self) -> tuple[int]:
+        boundary = self.objects.get("boundary-1")
+
+        # If we couldn't find the boundary
+        if boundary is None:
+            for item in self.objects:
+                if item["type"] == ObjectTypes.BOUNDARY.value:
+                    boundary = item
+                    break
+
+        width = boundary[3][0] - boundary[0][0]
+        height = boundary[0][1] - boundary[1][1]
+        return (width, height)
