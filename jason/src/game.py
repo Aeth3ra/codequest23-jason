@@ -22,6 +22,7 @@ class Game:
         self.enemy_id = tank_id_message["message"]["enemy-tank-id"]
 
         self.previous_dest = None
+        self.keep_dest = False
         self.current_turn_message = None
         self.wall_map = None
 
@@ -153,15 +154,23 @@ class Game:
         x_min, x_max = int(play_area[0][0]), int(play_area[2][0])
         y_min, y_max = int(play_area[2][1]), int(play_area[0][1])
         self_x, self_y = self.objects[self.tank_id]["position"]
-
+        
         map_width, map_height = self.get_map_size()
+        in_danger = not (x_min < self_x < x_max) or not (y_min < self_y < y_max) or (y_max-y_min < 0.1*map_height)
 
-        # If inside danger zone
-        if not (x_min < self_x < x_max) or not (y_min < self_y < y_max) or (y_max-y_min < 0.1*map_height):
-            middle_x = map_width // 2
-            middle_y = map_height // 2
+        middle_x = map_width // 2
+        middle_y = map_height // 2
+
+        # If inside danger zone and not moving
+        if in_danger and self.objects[self.tank_id]["velocity"][0] == 0 and self.objects[self.tank_id]["velocity"][1] == 0:
+            prev_x, prev_y = self.previous_dest
+            return [prev_x+20, prev_y-20]
+
+        elif in_danger and not self.keep_dest:
             return [middle_x, middle_y]
-        else:
+        
+        elif not in_danger:
+            self.keep_dest = False
             random_move_x = random.randrange(x_min, x_max)
             random_move_y = random.randrange(y_min, y_max)
             return [random_move_x, random_move_y]
