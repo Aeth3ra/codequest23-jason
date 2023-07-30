@@ -23,6 +23,7 @@ class Game:
 
         self.previous_dest = None
         self.current_turn_message = None
+        self.wall_map = None
 
         # We will store all game objects here
         self.objects = {}
@@ -91,9 +92,13 @@ class Game:
         This is where you should write your bot code to process the data and respond to the game.
         """
 
+        #print(self.objects, file=sys.stderr)
+
         # Write your code here... For demonstration, this bot just shoots randomly every turn.
         turn = {}
-        turn["shoot"] = self.shoot_at_enemy()
+
+        if self.dont_shoot_walls:
+            turn["shoot"] = self.shoot_at_enemy()
 
         # Make sure we don't path to the same place twice
         if self.path_find() != self.previous_dest:
@@ -101,7 +106,20 @@ class Game:
             turn["path"] = dest
             self.previous_dest = dest
         
+        #print(self.objects, file=sys.stderr)
+
         comms.post_message(turn)
+
+        first_time = True
+        bigx, bigy = self.get_map_size()
+        self.wall_map = [[0 for x in range(bigy)] for y in range(bigx)] 
+        if first_time:
+            for item in self.objects.values():
+                print(item, file=sys.stderr)
+                if item["type"] == ObjectTypes.WALL.value:
+                    self.wall_map[int(item["position"][0])][int(item["position"][1])] = 1
+            first_time = False
+            
 
     def shoot_at_enemy(self):
         target_angle = 0
@@ -153,7 +171,7 @@ class Game:
 
         # If we couldn't find the boundary
         if boundary is None:
-            for item in self.objects:
+            for item in self.objects.values():
                 if item["type"] == ObjectTypes.CLOSING_BOUNDARY.value:
                     boundary = item
                     break
@@ -185,7 +203,7 @@ class Game:
 
         width = boundary[3][0] - boundary[0][0]
         height = boundary[0][1] - boundary[1][1]
-        return (width, height)
+        return (int(width), int(height))
     
     def find_powerup(self):
         self_x, self_y = self.objects[self.tank_id]["position"]
@@ -201,3 +219,26 @@ class Game:
                     nearest_dist = dist
                     nearest_power_x = power_x
                     nearest_power_y = power_y
+        
+    
+    def dont_shoot_walls(self) -> bool:
+        vert_imposition = False
+        hor_imposition = False
+
+        my_vert_axis = self.object[self.tank_id]["position"][1]
+        my_hor_axis = self.object[self.tank_id]["position"][0]
+
+        hor_range = (my_hor_axis-25, my_hor_axis+25)
+        ver_range = (my_vert_axis-25, my_hor_axis+25)
+
+        for possible_x in range(hor_range[0], hor_range[1]):
+            if self.wall_map[possible_x][my_vert_axis] == 1:
+                hor_imposition = True
+        for possible_y in range(ver_range[0], ver_range[1]):
+            if self.wall_map[my_hor_axis][possible_y] == 1:
+                vert_imposition = True
+
+        if hor_imposition == True or vert_imposition == True:
+            return False
+        else:
+            return True
